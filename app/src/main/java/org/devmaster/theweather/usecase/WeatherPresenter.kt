@@ -1,6 +1,6 @@
 package org.devmaster.theweather.usecase
 
-import io.reactivex.Observable
+import io.reactivex.Flowable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -13,31 +13,50 @@ class WeatherPresenter(private val mRepository: WeatherRepository,
     : WeatherContract.Presenter {
 
     private var mDisposable: Disposable? = null
-    private var mObservable: Observable<CurrentWeather>? = null
+    private var mLastFlowable: Flowable<CurrentWeather>? = null
 
-    override fun getWeather(lat: Double, log: Double) = observe(mRepository.getWeather(lat, log))
+    override fun getWeather(lat: Double, log: Double) {
+        observe(mRepository.getWeather(lat, log))
+    }
 
-    override fun getWeather(location: String) = observe(mRepository.getWeather(location))
+    override fun getWeather(location: String) {
+        observe(mRepository.getWeather(location))
+    }
 
     override fun refresh() {
-        mObservable?.let { observe(it) }
+        mLastFlowable?.let { flowable ->
+            observe(flowable)
+        }
     }
 
-    private fun observe(observable: Observable<CurrentWeather>) {
-        mObservable = observable
+    private fun observe(flowable: Flowable<CurrentWeather>) {
 
-        mView.setProgressIndicator(true)
-        mDisposable = observable.subscribeOn(Schedulers.computation())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ weather ->
-                    mView.showWeathers(weather)
-                }, { error ->
-                    mView.showErrorPlaceholder(error)
-                    mView.setProgressIndicator(false)
-                }, {
-                    mView.setProgressIndicator(false)
-                })
+        mLastFlowable = flowable
+
+        flowable
+                .compose(applySchedulers())
+                .compose(updateView())
+                .subscribe()
     }
+
+    private fun applySchedulers(): (Flowable<CurrentWeather>) -> Flowable<CurrentWeather> {
+        return { flowable ->
+            flowable
+                    .subscribeOn(Schedulers.computation())
+                    .observeOn(AndroidSchedulers.mainThread())
+        }
+    }
+
+    private fun updateView(): (Flowable<CurrentWeather>) -> Flowable<CurrentWeather> {
+        return { flowable ->
+            flowable
+                    .doOnSubscribe({ run { mView.showProgressIndicator() } })
+                    .doOnNext(mView::showWeathers)
+                    .doOnError(mView::showErrorPlaceholder)
+                    .doAfterTerminate(mView::hideProgressIndicator)
+        }
+    }
+
 
     override fun onStop() {
         mDisposable?.dispose()

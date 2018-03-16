@@ -1,8 +1,7 @@
 package org.devmaster.theweather.data
 
 import io.reactivex.Maybe
-import io.reactivex.Observable
-import io.reactivex.observers.TestObserver
+import io.reactivex.subscribers.TestSubscriber
 import org.devmaster.theweather.RxPluginHelper
 import org.devmaster.theweather.data.local.WeatherDao
 import org.devmaster.theweather.data.network.WeatherApi
@@ -49,14 +48,14 @@ class WeatherRepositoryTest {
         val mockResultFromApi = Mockito.mock(CurrentWeather::class.java)
 
         `when`(mMockWeatherDao.getWeather()).thenReturn(Maybe.empty())
-        `when`(mMockWeatherApi.getWeather(location)).thenReturn(Observable.just(mockResultFromApi))
+        `when`(mMockWeatherApi.getWeather(location)).thenReturn(Maybe.just(mockResultFromApi))
 
         // When
-        val testObserver = TestObserver<CurrentWeather>()
-        mRepository.getWeather(location).subscribe(testObserver)
+        val testSubscriber = TestSubscriber<CurrentWeather>()
+        mRepository.getWeather(location).subscribe(testSubscriber)
 
         // Then
-        testObserver.assertNoErrors()
+        testSubscriber.assertNoErrors()
                 .assertValueAt(0, mockResultFromApi)
                 .assertComplete()
     }
@@ -71,14 +70,14 @@ class WeatherRepositoryTest {
         val mockResultFromApi = Mockito.mock(CurrentWeather::class.java)
 
         `when`(mMockWeatherDao.getWeather()).thenReturn(Maybe.just(mockResultFromDb))
-        `when`(mMockWeatherApi.getWeather(location)).thenReturn(Observable.just(mockResultFromApi))
+        `when`(mMockWeatherApi.getWeather(location)).thenReturn(Maybe.just(mockResultFromApi))
 
         // When
-        val testObserver = TestObserver<CurrentWeather>()
-        mRepository.getWeather(location).subscribe(testObserver)
+        val testSubscriber = TestSubscriber<CurrentWeather>()
+        mRepository.getWeather(location).subscribe(testSubscriber)
 
         // Then
-        testObserver.assertNoErrors()
+        testSubscriber.assertNoErrors()
                 .assertValueAt(0, mockResultFromDb)
                 .assertValueAt(1, mockResultFromApi)
                 .assertComplete()
@@ -93,14 +92,14 @@ class WeatherRepositoryTest {
         val mockResultFromDb = Mockito.mock(CurrentWeather::class.java)
 
         `when`(mMockWeatherDao.getWeather()).thenReturn(Maybe.just(mockResultFromDb))
-        `when`(mMockWeatherApi.getWeather(location)).thenReturn(Observable.error(RuntimeException()))
+        `when`(mMockWeatherApi.getWeather(location)).thenReturn(Maybe.error(RuntimeException()))
 
         // When
-        val testObserver = TestObserver<CurrentWeather>()
-        mRepository.getWeather(location).subscribe(testObserver)
+        val testSubscriber = TestSubscriber<CurrentWeather>()
+        mRepository.getWeather(location).subscribe(testSubscriber)
 
         // Then
-        testObserver.assertValueAt(0, mockResultFromDb)
+        testSubscriber.assertValueAt(0, mockResultFromDb)
                 .assertError(RuntimeException::class.java)
     }
 

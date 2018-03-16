@@ -1,6 +1,6 @@
 package org.devmaster.theweather.usecase
 
-import io.reactivex.Observable
+import io.reactivex.Flowable
 import org.devmaster.theweather.DataHelper
 import org.devmaster.theweather.RxPluginHelper
 import org.devmaster.theweather.data.WeatherRepository
@@ -10,7 +10,6 @@ import org.junit.FixMethodOrder
 import org.junit.Test
 import org.junit.runners.MethodSorters
 import org.mockito.Mock
-import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.verify
 import org.mockito.MockitoAnnotations
@@ -48,15 +47,15 @@ class WeatherPresenterTest {
 
         // Prepare
         `when`(mMockRepository.getWeather(lat, lon))
-                .thenReturn(Observable.just(expected))
+                .thenReturn(Flowable.just(expected))
 
         // When
         mPresenter.getWeather(lat, lon)
 
         // Then
-        verify(mMockView).setProgressIndicator(true)
+        verify(mMockView).showProgressIndicator()
         verify(mMockView).showWeathers(expected)
-        verify(mMockView).setProgressIndicator(false)
+        verify(mMockView).hideProgressIndicator()
     }
 
 
@@ -68,15 +67,15 @@ class WeatherPresenterTest {
         // Prepare
         val error = RuntimeException()
         `when`(mMockRepository.getWeather(location))
-                .thenReturn(Observable.error(error))
+                .thenReturn(Flowable.error(error))
 
         // When
         mPresenter.getWeather(location)
 
         // Then
-        verify(mMockView).setProgressIndicator(true)
+        verify(mMockView).showProgressIndicator()
         verify(mMockView).showErrorPlaceholder(error)
-        verify(mMockView).setProgressIndicator(false)
+        verify(mMockView).hideProgressIndicator()
     }
 
 }

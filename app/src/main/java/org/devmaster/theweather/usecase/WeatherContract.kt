@@ -8,7 +8,8 @@ interface WeatherContract {
     interface View {
         fun showWeathers(weather: CurrentWeather)
         fun showErrorPlaceholder(error: Throwable)
-        fun setProgressIndicator(active: Boolean)
+        fun showProgressIndicator()
+        fun hideProgressIndicator()
         fun hidePlaceholders()
     }
 

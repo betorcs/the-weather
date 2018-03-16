@@ -139,9 +139,14 @@ class WeatherActivity : AppCompatActivity(), WeatherContract.View {
         mSnackbar?.show()
     }
 
-    override fun setProgressIndicator(active: Boolean) {
-        mBinding.swipeRefreshLayout.isRefreshing = active
-        mBinding.swipeRefreshLayout.isActivated = !active
+    override fun showProgressIndicator() {
+        mBinding.swipeRefreshLayout.isRefreshing = true
+        mBinding.swipeRefreshLayout.isActivated = false
+    }
+
+    override fun hideProgressIndicator() {
+        mBinding.swipeRefreshLayout.isRefreshing = false
+        mBinding.swipeRefreshLayout.isActivated = true
     }
 
     override fun hidePlaceholders() {
