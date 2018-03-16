@@ -1,11 +1,15 @@
 language: java
+
 jdk:
   - oraclejdk8
-script:
-  - "./gradlew clean test"
+
+install: true
+
 notifications:
   email:
     recipients:
       - betorcs@gmail.com
     on_success: never # default: change
     on_failure: always # default: always
+    
+script: ./gradlew clean test
