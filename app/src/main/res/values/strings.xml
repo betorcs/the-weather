@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">TheWeather</string>
+    <string name="search">Search</string>
+    <string name="refresh">Refresh</string>
+    <string name="search_hint">London,UK</string>
+    <string name="temp">%.01f</string>
+    <string name="celsius_unit">°C</string>
+    <string name="generic_error_message">Something was wrong trying to get the weather</string>
+    <string name="weather">Weather</string>
+    <string name="location_permission_rationale">We need your location to provide the weather</string>
+    <string name="location_cannot_be_determinated">Impossible to determine your location</string>
+</resources>
