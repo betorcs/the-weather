@@ -12,4 +12,5 @@ notifications:
     on_success: never # default: change
     on_failure: always # default: always
     
-script: ./gradlew clean test
+script: 
+  - "./gradlew clean test"
